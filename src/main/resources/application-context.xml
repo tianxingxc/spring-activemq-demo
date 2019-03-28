@@ -11,21 +11,37 @@
         <property name="targetConnectionFactory" ref="targetConnectionFactory"/>
     </bean>
 
+    <bean id="providerService" class="com.tx.activemq.service.impl.ProviderServiceImpl"/>
+
     <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
         <property name="connectionFactory" ref="connectionFactory" />
         <!-- 发布订阅模式 -->
         <property name="pubSubDomain" value="true"/>
         <!-- 消息持久化 -->
         <property name="deliveryMode" value="2"/>
-        <property name="sessionAcknowledgeMode" value="1"/>
+        <property name="sessionTransacted" value="true" />
     </bean>
 
     <bean id="testQueue" class="org.apache.activemq.command.ActiveMQQueue">
         <property name="physicalName" value="test-queue" />
     </bean>
 
+    <bean id="dlqQueue" class="org.apache.activemq.command.ActiveMQQueue">
+        <property name="physicalName" value="ActiveMQ.DLQ" />
+    </bean>
+
     <bean id="testTopic" class="org.apache.activemq.command.ActiveMQTopic">
         <property name="physicalName" value="test.topic"/>
+    </bean>
+
+    <bean id="dlqMessageListener" class="com.tx.activemq.DlqMessageListener" />
+
+    <bean class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="sessionTransacted" value="true"/>
+        <property name="connectionFactory" ref="connectionFactory" />
+        <property name="destination" ref="dlqQueue"/>
+        <property name="sessionAcknowledgeMode" value="1"/>
+        <property name="messageListener" ref="dlqMessageListener" />
     </bean>
 
 </beans>

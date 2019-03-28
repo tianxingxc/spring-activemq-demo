@@ -1,24 +1,19 @@
 package com.tx.activemq;
 
-import com.tx.activemq.service.ProviderService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:application-context.xml")
-public class Provider {
-
-    @Autowired
-    private ProviderService providerService;
+@ContextConfiguration("classpath:dlq.xml")
+public class DlqTester {
 
     @Test
-    public void provider() {
-        providerService.sendMsg();
+    public void dlq() {
+        System.out.println("dlq message...");
         try {
             System.in.read();
         } catch (IOException e) {

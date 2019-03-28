@@ -5,32 +5,26 @@
 
     <bean id="targetConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
         <property name="brokerURL" value="tcp://127.0.0.1:61616" />
-        <!--如果有多个订阅者，每个订阅者需要指定不同的 clientId -->
-        <property name="clientID" value="002" />
     </bean>
 
     <bean id="connectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">
         <property name="targetConnectionFactory" ref="targetConnectionFactory"/>
     </bean>
 
-    <bean id="destination" class="org.apache.activemq.command.ActiveMQQueue">
-        <property name="physicalName" value="test-queue" />
+    <bean id="dlqQueue" class="org.apache.activemq.command.ActiveMQQueue">
+        <property name="physicalName" value="ActiveMQ.DLQ" />
     </bean>
 
-    <bean id="testTopic" class="org.apache.activemq.command.ActiveMQTopic">
-        <property name="physicalName" value="test.topic"/>
-    </bean>
-
-    <bean id="listener" class="com.tx.activemq.TestMessageListener" />
+    <bean id="dlqMessageListener" class="com.tx.activemq.DlqMessageListener" />
 
     <bean class="org.springframework.jms.listener.DefaultMessageListenerContainer">
         <property name="connectionFactory" ref="connectionFactory"/>
-        <property name="destination" ref="testTopic"/>
-        <property name="messageListener" ref="listener"/>
+        <property name="destination" ref="dlqQueue"/>
+        <property name="messageListener" ref="dlqMessageListener"/>
         <property name="sessionAcknowledgeMode" value="1"/>
-        <property name="subscriptionDurable" value="true"/>
-        <!--如果有多个订阅者，每个订阅者需要指定不同的 clientId -->
-        <property name="clientId" value="002"/>
+        <!--应答模式是 INDIVIDUAL_ACKNOWLEDGE-->
+        <!--<property name="sessionAcknowledgeMode" value="4"/>-->
+        <!--<property name="transactionManager" ref="transactionManager" />-->
         <property name="sessionTransacted" value="true" />
     </bean>
 
